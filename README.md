@@ -4,6 +4,8 @@
 
 The computation of genome similarity is important in computational biology applications, and is assessed by calculating Jaccard similarity of DNA sequencing sets. However, it’s challenging to find solutions that can compute Jaccard similarity with the efficiency and scalability needed to fully utilize capabilities of modern HPC hardware. We introduce a novel algorithm for computing Jaccard similarity for genome comparisons, founded on an actor-based programming model. Our algorithm takes advantage of fine-grained asynchronous computations, distributed/shared memory model, and the Fine-grained Asynchronous Bulk-Synchronous Parallelism execution model. Our performance results on the NERSC Perlmutter supercomputer demonstrate that this approach scales to 16,384 cores, showing an average of 3.6× and 5.5× improvement in execution time and hardware counters compared to a state-of-the-art baseline. Moreover, we propose a novel compiler approach enabling programmers to optionally develop distributed code using the familiar BSP-based Partitioned Global Address Space model while automatically generating Actor-based code for improved performance.
 
+The code for our algorithm can be found [here](https://github.com/youssefelmougy/jaccard-selector/blob/main/Selector/hclib/modules/bale_actor/jaccard-selector/jaccard_kmer_selector.cpp) (in `/hclib/modules/bale_actor/jaccard-selector/`).
+
 ## Installation Instructions
 
 The following installation instructions are for the Perlmutter supercomputer at the National Energy Research Scientific Computing Center (NERSC). 
