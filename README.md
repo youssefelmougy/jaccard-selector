@@ -165,7 +165,7 @@ The folder structure of this repository is as follows:
     │   │   ├── jaccard.cxx                                  # Application code for GenomeAtScale
     │   │   ├── kmer_matrix.zip                              # K-mer matrix files for evaluation
     │   └── ─── ...                                    
-    ├── ActorCode_from_PGASOpenMP                            # Contains PGAS-OpenMP code and translated Actor-based code (Section 6)
+    ├── PGASOpenMP-to-Actor                                  # Contains PGAS-OpenMP code and translated Actor-based code (Section 6)
     ├── scripts                                              # Contains installation, running, and modules scripts and sample Perlmutter sbatch files
     │   ├── setup.sh                                         # Installation and build script for the system backends and application code for both the Selector application and the GenomeAtScale application
     │   ├── run.sh                                           # Run script for both the selector application and GenomeAtScale application
