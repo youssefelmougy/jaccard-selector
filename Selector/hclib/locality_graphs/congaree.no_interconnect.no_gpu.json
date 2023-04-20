@@ -1,0 +1,20 @@
+{
+    "nworkers": 12,
+    "declarations": [
+        "sysmem",
+        "L1_0", "L1_1", "L1_2", "L1_3", "L1_4", "L1_5", "L1_6", "L1_7", "L1_8",
+        "L1_9", "L1_10", "L1_11"
+    ],
+    "reachability": [
+        ["sysmem", "L1_0"], ["sysmem", "L1_1"],  ["sysmem", "L1_2"],
+        ["sysmem", "L1_3"], ["sysmem", "L1_4"],  ["sysmem", "L1_5"],
+        ["sysmem", "L1_6"], ["sysmem", "L1_7"],  ["sysmem", "L1_8"],
+        ["sysmem", "L1_9"], ["sysmem", "L1_10"], ["sysmem", "L1_11"]
+    ],
+    "pop_paths": {
+        "default": ["L1_$(id)", "sysmem"]
+    },
+    "steal_paths": {
+        "default": ["L1_$(id)", "sysmem"]
+    }
+}

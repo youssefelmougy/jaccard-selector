@@ -1,0 +1,91 @@
+#!/bin/bash
+#PBS -A csc205
+#PBS -N max
+#PBS -j oe
+#PBS -q debug
+#PBS -l walltime=00:15:00
+#PBS -l nodes=32
+#PBS -l gres=atlas1%atlas2
+#PBS -V
+
+# TOY - 26
+# MINI - 29
+# SMALL - 32
+# MEDIUM - 36
+# LARGE - 39
+# HUGE - 42
+
+# export GASNET_MAX_SEGSIZE='512MB'
+# cd $PBS_O_WORKDIR
+cd /ccs/proj/csc205/max/hclib/test/performance-regression/cpu-only/graph500-2.1.4
+export LD_LIBRARY_PATH=/opt/gcc/4.9.0/snos/lib64:$LD_LIBRARY_PATH
+
+export LD_LIBRARY_PATH=$PROJ_DIR/hclib/modules/openshmem/lib:$LD_LIBRARY_PATH
+export HCLIB_LOCALITY_FILE=$PROJ_DIR/hclib/locality_graphs/titan.no_gpu.json
+export GASNET_BACKTRACE=1
+export SMA_SYMMETRIC_SIZE=1073741824
+export GASNET_PHYSMEM_MAX=1G
+export LD_PRELOAD=/lustre/atlas/sw/tbb/43/sles11.3_gnu4.8.2/source/build/linux_intel64_gcc_cc4.8.2_libc2.11.3_kernel3.0.101_release/libtbbmalloc_proxy.so.2
+ulimit -c unlimited
+
+NODES=$PBS_NUM_NODES
+
+# aprun -n 1 -d 16 -N 1 ./seq-csr/seq-csr
+# 
+# echo
+# echo
+# 
+# aprun -n 1 -d 16 -N 1 ./seq-list/seq-list
+# 
+# echo
+# echo
+# 
+# aprun -n 1 -d 16 -N 1 ./omp-csr/omp-csr
+# 
+# echo
+# echo
+# 
+# aprun -n 2 -d 16 -N 1 ./mpi/graph500_mpi_simple 20 16
+# 
+# echo
+# echo
+
+# For GRAPH_SIZE=26, one-sided only succeeds without OOM with NODES>=128
+# For GRAPH_SIZE=29, one-sided only succeeds without OOM with NODES>=1024
+# Anything beyond that requires an exceesive amount of nodes on Titan
+export GRAPH_SIZE=20
+export OMP_NUM_THREADS=1
+
+NRUNS=1
+
+# aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./mpi/graph500_mpi_one_sided $GRAPH_SIZE 16
+
+# for I in $(seq $NRUNS); do
+#     aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./mpi/graph500_mpi_simple $GRAPH_SIZE 16
+# done
+
+# for I in $(seq $NRUNS); do
+#     aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./mpi/graph500_mpi_replicated $GRAPH_SIZE 16
+# done
+# 
+# for I in $(seq $NRUNS); do
+#     aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./mpi/graph500_mpi_replicated_csc $GRAPH_SIZE 16
+# done
+# 
+for I in $(seq $NRUNS); do
+    aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./mpi/graph500_mpi_one_sided $GRAPH_SIZE 16
+done
+
+# for I in $(seq $NRUNS); do
+#     aprun -n $(($PBS_NUM_NODES * 16)) -d 1 -S 8 -N 16 -cc 0:1:2:3:4:5:6:7:8:9:10:11:12:13:14:15 ./oshmem/bfs_oshmem-single-mailbox $GRAPH_SIZE 16
+# done
+
+# aprun -ss -n $(($NODES * 16)) -d 1 -N 16 -S 8 ./bin/isx.weak 33554432 /tmp/output_weak
+# 
+# export OMP_NUM_THREADS=1
+# export HCLIB_WORKERS=1
+# aprun -ss -n $(($NODES * 16)) -d 1 -N 16 -S 8 ./bin/isx.hclib.weak 33554432 /tmp/output_weak
+# 
+# export OMP_NUM_THREADS=8
+# export HCLIB_WORKERS=8
+# aprun -n $(($NODES * 2)) -d 8 -N 2 -S 1 ./bin/isx.hclib.weak 268435456 /tmp/output_weak

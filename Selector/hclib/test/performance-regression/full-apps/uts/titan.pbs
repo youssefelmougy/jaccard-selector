@@ -1,0 +1,103 @@
+#!/bin/bash
+#PBS -A csc205
+#PBS -N max
+#PBS -j oe
+#PBS -q debug
+#PBS -l walltime=00:20:00
+#PBS -l nodes=1
+#PBS -l gres=atlas1%atlas2
+#PBS -V
+
+# export GASNET_MAX_SEGSIZE='512MB'
+# cd $PBS_O_WORKDIR
+cd /ccs/proj/csc205/max/hclib/test/performance-regression/cpu-only/uts
+source sample_trees.sh
+
+export LD_LIBRARY_PATH=/opt/gcc/4.9.0/snos/lib64:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$PROJ_DIR/hclib/modules/openshmem/lib:$LD_LIBRARY_PATH
+ulimit -c unlimited
+
+# for NODES in 16 32; do
+for NODES in $PBS_NUM_NODES; do
+    # for THREADS in 1 2 4 8 16; do
+    for THREADS in 16; do
+        export OMP_NUM_THREADS=$THREADS
+        export HCLIB_WORKERS=$THREADS
+        export LD_PRELOAD=/lustre/atlas/sw/tbb/43/sles11.3_gnu4.8.2/source/build/linux_intel64_gcc_cc4.8.2_libc2.11.3_kernel3.0.101_release/libtbbmalloc_proxy.so.2
+        export HCLIB_LOCALITY_FILE=$PROJ_DIR/hclib/locality_graphs/titan.no_gpu.json
+        export GASNET_BACKTRACE=1
+        # aprun -cc none --pes-per-node 1 -n $NODES -d 16 -m 32G ./uts-hclib-shmem-naive $T1XXL
+        # aprun -cc none --pes-per-node 1 -n $NODES -d 16 -m 32G ./uts-omp-task-shmem $T1XXL
+        # aprun -cc none --pes-per-node 1 -n $(($NODES * 1)) -d 16 ./uts-shmem $T1XXL
+
+        aprun -cc none --pes-per-node 1 -n $NODES -d 16 -m 32G ./uts-shmem-omp $T1
+
+        export OMP_NUM_THREADS=1
+        export HCLIB_WORKERS=1
+        export SMA_SYMMETRIC_SIZE=402653184
+        export SHMEM_SYMMETRIC_HEAP_SIZE=$SMA_SYMMETRIC_SIZE
+        export GASNET_PHYSMEM_MAX=16G
+        aprun -cc none --pes-per-node 16 -n $(($NODES * 16)) -S 8 -d 1 ./uts-shmem $T1
+    done
+done
+
+# EVENTS="-e WALLCLOCK@5000"
+# EVENTS="$EVENTS -e PAPI_L1_DCM"
+# EVENTS="$EVENTS -e PAPI_L1_DCH"
+# EVENTS="$EVENTS -e PAPI_L2_DCM"
+# EVENTS="$EVENTS -e PAPI_L2_DCH"
+# EVENTS="$EVENTS -e PAPI_L3_DCM"
+# EVENTS="$EVENTS -e PAPI_L3_DCH"
+# EVENTS="$EVENTS -e PAPI_TOT_IIS"
+
+# EVENTS="-e perf::L1-DCACHE-LOAD-MISSES"
+# # EVENTS="$EVENTS -e perf::L1-DCACHE-STORE-MISSES"
+# # EVENTS="$EVENTS -e perf::LLC-LOAD-MISSES"
+# # EVENTS="$EVENTS -e perf::LLC-STORE-MISSES"
+# # EVENTS="$EVENTS -e perf::DTLB-LOAD-MISSES"
+# # EVENTS="$EVENTS -e perf::DTLB-STORE-MISSES"
+# # EVENTS="$EVENTS -e perf::BRANCH-LOAD-MISSES"
+# # EVENTS="$EVENTS -e L3_EVICTIONS"
+# 
+# aprun -cc none -n 1 -d 16 -m 32G hpcrun -t $EVENTS -o $MEMBERWORK/csc205/uts-hclib-measurements ./uts-hclib $T1L
+# aprun -cc none -n 1 -d 16 -m 32G hpcrun -t $EVENTS -o $MEMBERWORK/csc205/uts-omp-measurements ./uts-omp $T1L
+
+# OpenMP SPMD
+# source ~/.bash_profile
+# for THREADS in 2 4 8 12 16; do
+# for THREADS in 16; do
+#     export OMP_NUM_THREADS=$THREADS
+#     aprun -cc none -n 1 -d 16 -m 32G ./uts-omp $T1L
+# done
+
+# # OpenMP tasks w/o cutoff
+# # source ~/.bash_profile
+# for THREADS in 2 4 8 12 16; do
+#     export OMP_NUM_THREADS=$THREADS
+#     aprun -cc none -n 1 -d 16 -m 32G ./uts-omp-task $T1L
+# done
+# 
+# # OpenMP tasks w/ cutoff
+# # source ~/.bash_profile
+# for THREADS in 2 4 8 12 16; do
+#     export OMP_NUM_THREADS=$THREADS
+#     aprun -cc none -n 1 -d 16 -m 32G ./uts-omp-task-cutoff $T1L
+# done
+
+# # HClib
+# # source ~/.bash_profile
+# for THREADS in 2 4 8 12 16; do
+#     export HCLIB_WORKERS=$THREADS
+#     LD_PRELOAD=libtbbmalloc_proxy.so.2 aprun -cc none -n 1 -d 16 -m 32G numactl --interleave 0,1 --cpunodebind=0,1 ./uts-hclib $T1L
+# done
+
+# MPI-WS
+# aprun -cc none --pes-per-node 1 --pes 32 -d 16 -m 32G ./uts-mpi-ws $T1L
+
+# OpenSHMEM Ref
+# source ~/.bash_profile
+# aprun --pes-per-node 1 --pes 32 -d 16 ./uts-shmem $T1L
+
+# Cray SHMEM
+# module load cray-shmem
+# XT_SYMMETRIC_HEAP_SIZE=1G aprun --pes-per-node 2 --pes 64 -d 8 ./uts-shmem $T1L

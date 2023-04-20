@@ -1,0 +1,18 @@
+
+An Asynchronous Distributed Actor-based Approach to Jaccard Similarity for Genome Comparisons
+----------------------------------------------------------------
+
+The whole experiment consists of two phases, 1: Prepare dependencies, building the HClib library, and building the 
+applications, 2: running the applications.
+
+Getting Started
+---------------
+
+1) Prepare dependencies, build libraries, and build the applications:
+
+    See the README file at https://github.com/youssefelmougy/jaccard-selector for setup instructions.
+
+2) Run the Selector version of Jaccard similarity for genome comparisons:
+
+    See the README file at https://github.com/youssefelmougy/jaccard-selector for run instructions
+

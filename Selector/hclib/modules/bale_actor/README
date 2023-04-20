@@ -1,0 +1,18 @@
+
+----------------------------------------------------------------
+
+Research papers available:
+
+[`A Fine-grained Asynchronous Bulk Synchronous parallelism model for PGAS applications`](https://www.sciencedirect.com/science/article/pii/S1877750323000741)
+
+[`A Productive and Scalable Actor-based Programming System for PGAS Applications`](https://www.iccs-meeting.org/archive/iccs2022/papers/133500232.pdf)
+
+
+PGAS runtimes are well suited to irregular applications due to their efficient support for short, non-blocking one-sided messages. However, there are two major sources of overhead in PGAS runtimes that prevent them from achieving acceptable performance on large scale parallel systems.  First, despite the availability of APIs that support non-blocking operations for important special cases, many PGAS operations on remote locations are synchronous by default, which can lead to long-latency stalls.  Second, efficient inter-node communication requires careful aggregation and management of short messages.
+
+Create a new programming system for PGAS runtimes, in which all remote operations are asynchronous by default through the use of an actor-based programming system. In this approach, the programmer does not need to worry about complexities related to message aggregation and termination detection. 
+
+Please check the 'jaccard-selector' directory for instructions to run the Selector version of Jaccard similarity for genome comparisons.
+
+Please check https://github.com/srirajpaul/hclib/tree/bale3_actor/modules/bale_actor/benchmarks for graph-based applications.
+
